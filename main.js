@@ -4,6 +4,7 @@ const fs = require('fs');
 
 let mainWindow;
 let tray = null;
+let unreadCount = 0;
 
 function loadWindowState() {
   const statePath = path.join(app.getPath('userData'), 'window-state.json');
@@ -115,6 +116,12 @@ function createWindow() {
       mainWindow.webContents.insertCSS(css);
     } catch (error) {
     }
+    
+    if (tray) {
+      setTimeout(() => {
+        updateTrayMenu();
+      }, 3000);
+    }
   });
 
   mainWindow.on('moved', saveWindowState);
@@ -167,16 +174,19 @@ function createWindow() {
     mainWindow.setTitle('Hydrogen');
     
     const match = title.match(/\((\d+)\)/);
-    if (match && Notification.isSupported()) {
-      const count = parseInt(match[1]);
-      if (count > 0) {
-        new Notification({
-          title: 'Hydrogen',
-          body: `You have ${count} unread message${count > 1 ? 's' : ''}`,
-          icon: path.join(__dirname, 'assets', 'icon.ico'),
-          silent: false
-        }).show();
-      }
+    const count = match ? parseInt(match[1]) : 0;
+    unreadCount = count;
+
+    updateAppIcon(count > 0);
+    updateTrayMenu();
+    
+    if (count > 0 && Notification.isSupported()) {
+      new Notification({
+        title: 'Hydrogen',
+        body: `You have ${count} unread message${count > 1 ? 's' : ''}`,
+        icon: path.join(__dirname, 'assets', 'icon.ico'),
+        silent: false
+      }).show();
     }
   });
 
@@ -203,37 +213,223 @@ function createWindow() {
   });
 }
 
+function updateAppIcon(hasUnread) {
+  const iconPath = path.join(__dirname, 'assets', hasUnread ? 'iconalert.ico' : 'icon.ico');
+  const icon = nativeImage.createFromPath(iconPath);
+  
+  if (!icon.isEmpty() && mainWindow) {
+    mainWindow.setIcon(icon);
+  }
+  
+  if (tray) {
+    tray.setImage(icon);
+  }
+}
+
+function updateTrayMenu() {
+  if (!tray) return;
+  
+  const recentContacts = [];
+  
+  if (mainWindow && mainWindow.webContents) {
+    setTimeout(() => {
+      if (!mainWindow || !mainWindow.webContents) {
+        buildTrayMenu([]);
+        return;
+      }
+      mainWindow.webContents.executeJavaScript(`
+      (function() {
+        const contacts = [];
+        const selectors = [
+          '[role="row"]',
+          'div[aria-label*="Chat"] > div > div',
+          'div[data-pagelet="LeftRail"] [role="row"]',
+          'div[aria-label*="Chaty"] [role="row"]',
+          'div[role="listbox"] > div',
+          'ul[role="list"] > li',
+          'div[role="list"] > div',
+          'a[role="row"]'
+        ];
+        
+        let chatItems = [];
+        for (const selector of selectors) {
+          const items = document.querySelectorAll(selector);
+          if (items.length > 0) {
+            chatItems = Array.from(items).filter(item => {
+              const text = item.textContent.trim();
+              return text.length > 0 && text.length < 200;
+            });
+            if (chatItems.length > 0) break;
+          }
+        }
+        
+        chatItems.forEach((item, index) => {
+          if (index < 5 && contacts.length < 5) {
+            let name = null;
+            const nameSelectors = [
+              'span[dir="auto"]',
+              'div[dir="auto"]',
+              'span[class*="name"]',
+              'div[class*="name"]',
+              'strong',
+              'span strong',
+              'a span',
+              'div span',
+              '[data-testid*="name"]',
+              'h1',
+              'h2',
+              'h3'
+            ];
+            
+            for (const nameSel of nameSelectors) {
+              const nameEl = item.querySelector(nameSel);
+              if (nameEl && nameEl.textContent.trim()) {
+                const candidate = nameEl.textContent.trim();
+                if (candidate.length > 0 && candidate.length < 50 && !candidate.match(/^\\d+[:\\s]/)) {
+                  name = candidate;
+                  break;
+                }
+              }
+            }
+            
+            if (!name) {
+              const text = item.textContent.trim();
+              const lines = text.split(/[\\n\\r]+/).filter(l => {
+                const trimmed = l.trim();
+                return trimmed.length > 0 && trimmed.length < 50 && !trimmed.match(/^\\d+[:\\s]/);
+              });
+              if (lines.length > 0) {
+                name = lines[0].trim();
+              }
+            }
+            
+            if (name && name.length > 0 && name.length < 50 && !name.match(/^\\d+$/)) {
+              contacts.push({
+                name: name,
+                index: index
+              });
+            }
+          }
+        });
+        
+        return contacts;
+      })();
+    `).then(contacts => {
+      if (contacts && contacts.length > 0) {
+        buildTrayMenu(contacts);
+      } else {
+        buildTrayMenu([]);
+      }
+    }).catch((err) => {
+      buildTrayMenu([]);
+    });
+    }, 2000);
+  } else {
+    buildTrayMenu([]);
+  }
+}
+
+function buildTrayMenu(recentContacts) {
+  const menuItems = [
+    {
+      label: 'Hydrogen',
+      enabled: false
+    },
+    { type: 'separator' }
+  ];
+  
+  if (unreadCount > 0) {
+    menuItems.push({
+      label: `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}`,
+      enabled: false
+    });
+    menuItems.push({ type: 'separator' });
+  }
+  
+  if (recentContacts.length > 0) {
+    menuItems.push({
+      label: 'Recent Contacts',
+      enabled: false
+    });
+    recentContacts.forEach((contact, idx) => {
+      menuItems.push({
+        label: contact.name.length > 30 ? contact.name.substring(0, 30) + '...' : contact.name,
+        click: () => {
+          if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.executeJavaScript(`
+              (function() {
+                const selectors = [
+                  '[role="row"]',
+                  'div[aria-label*="Chat"] > div > div',
+                  'div[data-pagelet="LeftRail"] [role="row"]'
+                ];
+                
+                let chatItems = [];
+                for (const selector of selectors) {
+                  chatItems = document.querySelectorAll(selector);
+                  if (chatItems.length > 0) break;
+                }
+                
+                const targetName = '${contact.name.replace(/'/g, "\\'").replace(/"/g, '\\"')}';
+                chatItems.forEach((item, index) => {
+                  if (index === ${contact.index || idx}) {
+                    item.click();
+                    return;
+                  }
+                  const text = item.textContent.trim();
+                  if (text.includes(targetName)) {
+                    item.click();
+                  }
+                });
+              })();
+            `);
+          }
+          if (mainWindow) {
+            mainWindow.show();
+            mainWindow.focus();
+          }
+        }
+      });
+    });
+    menuItems.push({ type: 'separator' });
+  }
+  
+  menuItems.push({
+    label: 'Focus',
+    click: () => {
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }
+  });
+  
+  menuItems.push({ type: 'separator' });
+  
+  menuItems.push({
+    label: 'Quit',
+    click: () => {
+      app.isQuitting = true;
+      app.quit();
+    }
+  });
+  
+  const contextMenu = Menu.buildFromTemplate(menuItems);
+  tray.setContextMenu(contextMenu);
+}
+
 function createTray() {
-  const iconPath = path.join(__dirname, 'assets', 'icon.ico');
+  const iconPath = path.join(__dirname, 'assets', unreadCount > 0 ? 'iconalert.ico' : 'icon.ico');
   let icon = nativeImage.createFromPath(iconPath);
   
   if (icon.isEmpty()) {
-    icon = nativeImage.createEmpty();
+    icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'icon.ico'));
   }
   
   tray = new Tray(icon);
+  tray.setToolTip(unreadCount > 0 ? `Hydrogen - ${unreadCount} unread` : 'Hydrogen');
   
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Focus',
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-          mainWindow.focus();
-        }
-      }
-    },
-    {
-      label: 'Quit',
-      click: () => {
-        app.isQuitting = true;
-        app.quit();
-      }
-    }
-  ]);
-  
-  tray.setToolTip('Hydrogen');
-  tray.setContextMenu(contextMenu);
+  updateTrayMenu();
   
   tray.on('click', () => {
     if (mainWindow) {
