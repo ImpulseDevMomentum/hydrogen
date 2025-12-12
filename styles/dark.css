@@ -1,0 +1,230 @@
+body,
+html {
+  background-color: #0d0d0d !important;
+  color: #e0e0e0 !important;
+}
+
+div[role="main"],
+main,
+section {
+  background-color: #0d0d0d !important; 
+}
+
+[role="navigation"],
+div[aria-label*="Chats"],
+div[aria-label*="Chaty"] {
+  background-color: #141414 !important;
+  border-right: 1px solid #2a2a2a !important;
+}
+
+div[role="banner"],
+header {
+  background-color: #0d0d0d !important;
+  border-bottom: 1px solid #2a2a2a !important;
+}
+
+[role="row"],
+div[role="navigation"] > div > div > div {
+  background-color: transparent !important;
+}
+
+[role="row"] > div {
+  background-color: #141414 !important;
+  border-radius: 8px;
+}
+
+[role="row"]:hover > div {
+  background-color: #1a1a1a !important;
+}
+
+[role="row"][aria-selected="true"] > div,
+[aria-current="true"] {
+  background-color: #202020 !important;
+}
+
+div[role="main"] > div > div {
+  background-color: #0d0d0d !important;
+}
+
+div[class*="__message"] {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-radius: 18px !important;
+  padding: 8px 12px !important;
+}
+
+div[dir="ltr"] > div[class*="__message"] {
+  background-color: #0066cc !important;
+  color: #ffffff !important;
+}
+
+div[role="textbox"][contenteditable="true"] {
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+div[role="textbox"] * {
+  color: #e0e0e0 !important;
+}
+
+div[role="textbox"][data-placeholder]:empty::before {
+  color: #808080 !important;
+}
+
+input[type="search"],
+input[placeholder*="Search"],
+input[placeholder*="Szukaj"] {
+  background-color: #3a3a3a !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #4a4a4a !important;
+  border-radius: 20px !important;
+}
+
+button {
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+button:hover {
+  background-color: #1a1a1a !important;
+  border-radius: 50% !important;
+}
+
+div[role="toolbar"] button,
+div[aria-label*="Message"] button {
+  background-color: transparent !important;
+}
+
+div[role="toolbar"] button:hover {
+  background-color: #2a2a2a !important;
+}
+
+button[aria-label*="Send"],
+button[aria-label*="Wyślij"] {
+  background-color: #0066cc !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+}
+
+button[aria-label*="Send"]:hover,
+button[aria-label*="Wyślij"]:hover {
+  background-color: #0052a3 !important;
+}
+
+svg {
+  color: #b0b0b0 !important;
+  fill: currentColor !important;
+}
+
+button:hover svg {
+  color: #ffffff !important;
+}
+
+img,
+image,
+[role="img"] img {
+  background-color: transparent !important;
+  filter: none !important;
+}
+
+div[role="img"],
+svg[role="img"] {
+  background-color: transparent !important;
+}
+
+div[data-visualcompletion="ignore-dynamic"] {
+  background-color: transparent !important;
+}
+
+div[role="menu"],
+div[role="dialog"],
+div[role="listbox"] {
+  background-color: #1a1a1a !important;
+  border: 1px solid #2a2a2a !important;
+  color: #e0e0e0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+div[role="menuitem"]:hover,
+div[role="option"]:hover {
+  background-color: #2a2a2a !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: #0d0d0d !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0d0d !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a !important;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a !important;
+}
+
+span,
+p,
+label,
+div[dir="auto"] {
+  color: #e0e0e0 !important;
+}
+
+a {
+  color: #4da6ff !important;
+}
+
+a:hover {
+  color: #66b3ff !important;
+}
+
+span[class*="timestamp"],
+time {
+  color: #808080 !important;
+  font-size: 12px !important;
+}
+
+hr,
+div[role="separator"] {
+  border-color: #2a2a2a !important;
+  background-color: #2a2a2a !important;
+}
+
+span[class*="badge"],
+div[role="status"] {
+  background-color: #cc0000 !important;
+  color: #ffffff !important;
+}
+
+div[role="dialog"][aria-label*="emoji"],
+div[role="dialog"][aria-label*="Emoji"] {
+  background-color: #1a1a1a !important;
+  border: 1px solid #2a2a2a !important;
+}
+
+video,
+canvas {
+  background-color: #000000 !important;
+}
+
+div[role="tooltip"] {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #3a3a3a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+div[role="banner"] > div {
+  background-color: #0d0d0d !important;
+}
+
+div[role="complementary"] {
+  background-color: #141414 !important;
+  border-left: 1px solid #2a2a2a !important;
+}
