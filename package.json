@@ -1,0 +1,39 @@
+{
+  "name": "hydrogen",
+  "version": "1.0.0",
+  "description": "Desktop wrapper for Facebook Messenger",
+  "keywords": [
+    "messenger",
+    "facebook",
+    "desktop",
+    "electron"
+  ],
+  "license": "MIT",
+  "author": "ThxImpulse",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.hydrogen.messenger",
+    "productName": "Hydrogen",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}
