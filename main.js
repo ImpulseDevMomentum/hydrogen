@@ -109,7 +109,7 @@ function createWindow() {
   });
 
   mainWindow.webContents.on('did-finish-load', () => {
-    const cssPath = path.join(__dirname, 'styles', 'dark-theme.css');
+    const cssPath = path.join(__dirname, 'styles', 'dark.css');
     try {
       const css = fs.readFileSync(cssPath, 'utf8');
       mainWindow.webContents.insertCSS(css);

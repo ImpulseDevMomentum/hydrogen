@@ -23,17 +23,40 @@
   "build": {
     "appId": "com.hydrogen.messenger",
     "productName": "Hydrogen",
+    "compression": "maximum",
+    "asar": true,
+    "asarUnpack": [],
+    "files": [
+      "main.js",
+      "src/**/*",
+      "styles/**/*",
+      "assets/icon.ico",
+      "assets/icon.icns",
+      "assets/icon.png",
+      "package.json"
+    ],
+    "extraFiles": [],
+    "extraResources": [],
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "compression": "maximum"
     },
     "mac": {
       "target": "dmg",
-      "icon": "assets/icon.icns"
+      "icon": "assets/icon.icns",
+      "compression": "maximum"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "compression": "maximum"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   }
 }
