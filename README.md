@@ -2,6 +2,6 @@
 
 # <img src="assets/logo.png" alt="Hydrogen" width="44" height="44" style="vertical-align: middle; font-size: 38;" > Hydrogen
 
-A wrapper around the web version of Messenger built with Electron, so you can still use a desktop application instead of that stupid fucking Facebook desktop version.
+Because Meta is abandoning the desktop Messenger app on december 15th, here's wrapper around the web version of Messenger built with Electron, so you can still use a desktop application instead of that stupid fucking Facebook desktop version. (Does it matter that this weights 200MB+? Nah.)
 
 </div>
